@@ -1,0 +1,36 @@
+services:
+  bind9:
+    container_name: Luismiserver
+    image: internetsystemsconsortium/bind9:9.18
+    platform: linux/amd64
+    ports:
+      - 55:53/tcp
+      - 55:53/udp
+    networks:
+      alex_subnet:
+        ipv4_address: 172.30.8.1
+    volumes:
+      - ./conf:/etc/bind
+      - ./zonas:/var/lib/bind
+    restart: always
+
+  cliente:
+    container_name: cliente2
+    image: alpine
+    platform: linux/amd64
+    tty: true
+    stdin_open: true
+    dns:
+      - 172.30.8.1  # IP del servidor DNS
+    networks:
+      luismi_subnet:
+        ipv4_address: 172.30.8.2
+
+networks:
+  luismi_subnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+          ip_range: 172.30.8.0/24
+          gateway: 172.30.8.254
